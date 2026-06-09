@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panini WM 2026 · Sticker Tracker</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #1c2330;
+  --surface3: #21262d;
+  --border: #30363d;
+  --accent: #f5a623;
+  --accent2: #e09112;
+  --accent-dim: rgba(245,166,35,0.12);
+  --green: #3fb950;
+  --green-dim: rgba(63,185,80,0.12);
+  --red: #f85149;
+  --blue: #58a6ff;
+  --text: #e6edf3;
+  --text2: #8b949e;
+  --text3: #6e7681;
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+[data-theme="light"] {
+  --bg: #f6f8fa;
+  --surface: #ffffff;
+  --surface2: #f0f2f5;
+  --surface3: #e8eaed;
+  --border: #d0d7de;
+  --text: #1f2328;
+  --text2: #57606a;
+  --text3: #8c959f;
+  --accent-dim: rgba(245,166,35,0.1);
+  --green-dim: rgba(63,185,80,0.1);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .2s,color .2s;}
+
+/* ── HEADER ── */
+#header{
+  position:sticky;top:0;z-index:200;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:0 16px;
+}
+.header-inner{
+  max-width:1400px;margin:0 auto;
+  display:flex;align-items:center;gap:12px;
+  height:56px;flex-wrap:wrap;
+}
+.logo{
+  font-family:'Barlow Condensed',sans-serif;
+  font-weight:900;font-size:1.2rem;
+  color:var(--accent);text-transform:uppercase;
+  letter-spacing:.04em;white-space:nowrap;
+}
+.logo span{color:var(--text2);font-weight:400;}
+.header-actions{display:flex;gap:6px;align-items:center;margin-left:auto;flex-wrap:wrap;}
+#searchInput{
+  background:var(--surface2);border:1px solid var(--border);
+  color:var(--text);padding:5px 10px;border-radius:var(--radius);
+  font-family:'Barlow',sans-serif;font-size:.82rem;width:160px;outline:none;
+  transition:border-color .15s;
+}
+#searchInput:focus{border-color:var(--accent);}
+.btn{
+  padding:5px 12px;border-radius:var(--radius);
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:.78rem;letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;border:none;white-space:nowrap;transition:all .15s;
+}
+.btn-accent{background:var(--accent);color:#000;}
+.btn-accent:hover{background:var(--accent2);}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border);}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+.btn-green{background:var(--green);color:#000;}
+.btn-green:hover{opacity:.85;}
+#themeToggle{font-size:1.1rem;background:none;border:none;cursor:pointer;padding:4px;}
+
+/* ── TABS ── */
+.tabs{
+  max-width:1400px;margin:0 auto;
+  display:flex;gap:4px;padding:12px 16px 0;
+}
+.tab{
+  padding:7px 16px;border-radius:var(--radius) var(--radius) 0 0;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;
+  cursor:pointer;border:1px solid transparent;border-bottom:none;
+  background:transparent;color:var(--text2);transition:all .15s;
+}
+.tab.active{background:var(--surface);color:var(--accent);border-color:var(--border);}
+.tab:hover:not(.active){color:var(--text);background:var(--surface2);}
+
+/* ── MAIN ── */
+#main{max-width:1400px;margin:0 auto;padding:16px;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* ── DASHBOARD ── */
+.dash-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  gap:10px;margin-bottom:16px;
+}
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:14px 16px;
+}
+.stat-val{
+  font-family:'Barlow Condensed',sans-serif;
+  font-weight:900;font-size:2rem;line-height:1;
+  color:var(--accent);
+}
+.stat-val.green{color:var(--green);}
+.stat-val.red{color:var(--red);}
+.stat-val.blue{color:var(--blue);}
+.stat-label{font-size:.72rem;color:var(--text2);margin-top:3px;text-transform:uppercase;letter-spacing:.05em;}
+
+.global-progress{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:16px;margin-bottom:16px;
+}
+.prog-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.prog-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.9rem;text-transform:uppercase;letter-spacing:.05em;}
+.prog-pct{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.3rem;color:var(--accent);}
+.prog-bar{height:8px;background:var(--surface3);border-radius:4px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:4px;transition:width .4s ease;}
+
+.top-teams{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:16px;margin-bottom:16px;
+}
+.section-title{
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:.9rem;text-transform:uppercase;letter-spacing:.05em;
+  margin-bottom:12px;color:var(--text2);
+}
+.top-team-list{display:flex;flex-direction:column;gap:6px;}
+.top-team-row{
+  display:flex;align-items:center;gap:8px;font-size:.82rem;
+}
+.top-team-code{
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  width:52px;color:var(--accent);
+}
+.top-team-bar{flex:1;height:5px;background:var(--surface3);border-radius:3px;overflow:hidden;}
+.top-team-fill{height:100%;background:var(--green);border-radius:3px;transition:width .3s;}
+.top-team-pct{font-size:.72rem;color:var(--text2);width:36px;text-align:right;}
+
+/* ── COLLECTION VIEW ── */
+.group-block{margin-bottom:12px;}
+.group-header{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:8px 12px;
+  display:flex;align-items:center;gap:10px;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--text2);
+}
+.group-name{color:var(--accent);}
+
+.team-block{
+  border:1px solid var(--border);border-radius:var(--radius);
+  margin-bottom:8px;overflow:hidden;
+}
+.team-header{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 14px;background:var(--surface);
+  cursor:pointer;user-select:none;transition:background .1s;
+}
+.team-header:hover{background:var(--surface2);}
+.team-flag{font-size:1.1rem;flex-shrink:0;}
+.team-code{
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:.95rem;letter-spacing:.04em;color:var(--accent);
+  width:44px;flex-shrink:0;
+}
+.team-name-label{font-size:.82rem;flex:1;color:var(--text);}
+.team-prog-wrap{display:flex;align-items:center;gap:8px;}
+.team-prog-bar{width:70px;height:4px;background:var(--surface3);border-radius:2px;overflow:hidden;}
+.team-prog-fill{height:100%;background:var(--green);border-radius:2px;transition:width .3s;}
+.team-prog-txt{font-size:.72rem;color:var(--text2);white-space:nowrap;min-width:48px;text-align:right;}
+.team-done-badge{font-size:.65rem;background:var(--green);color:#000;padding:1px 6px;border-radius:10px;font-weight:700;}
+.chevron{color:var(--text3);font-size:.7rem;transition:transform .2s;flex-shrink:0;}
+.team-block.collapsed .chevron{transform:rotate(-90deg);}
+.team-block.collapsed .stickers-grid{display:none;}
+
+.stickers-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
+  gap:1px;background:var(--border);
+  border-top:1px solid var(--border);
+}
+.sticker-row{
+  background:var(--surface);padding:6px 10px;
+  display:flex;align-items:center;gap:6px;
+  transition:background .1s;
+}
+.sticker-row:hover{background:var(--surface2);}
+.sticker-row.is-owned{background:var(--green-dim);}
+.sticker-row.is-wappen{border-left:2px solid var(--accent);}
+.sticker-row.is-foto{border-left:2px solid var(--blue);}
+
+.s-checkbox{
+  width:15px;height:15px;border-radius:3px;
+  border:1.5px solid var(--border);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:.6rem;transition:all .12s;
+  background:transparent;
+}
+.sticker-row.is-owned .s-checkbox{background:var(--green);border-color:var(--green);color:#000;}
+.s-code{
+  font-family:'Barlow Condensed',sans-serif;font-weight:600;
+  font-size:.78rem;color:var(--text2);flex:1;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.sticker-row.is-owned .s-code{color:var(--green);}
+.sticker-row.is-wappen .s-code::after{content:'★';color:var(--accent);margin-left:3px;font-size:.65rem;}
+.sticker-row.is-foto .s-code::after{content:'📷';margin-left:3px;font-size:.6rem;}
+
+.qty-wrap{display:flex;align-items:center;gap:3px;flex-shrink:0;}
+.qty-btn{
+  width:18px;height:18px;border-radius:3px;border:1px solid var(--border);
+  background:var(--surface3);color:var(--text2);cursor:pointer;
+  font-size:.75rem;display:flex;align-items:center;justify-content:center;
+  line-height:1;padding:0;transition:all .1s;
+}
+.qty-btn:hover{border-color:var(--accent);color:var(--accent);}
+.qty-num{
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:.78rem;min-width:16px;text-align:center;
+  color:var(--text);
+}
+.qty-num.dup{color:var(--accent);}
+.dup-badge{
+  font-size:.6rem;background:var(--accent-dim);color:var(--accent);
+  padding:1px 4px;border-radius:3px;font-weight:700;white-space:nowrap;
+}
+
+/* Specials section */
+.specials-block{
+  background:var(--surface);border:1px solid var(--accent);
+  border-radius:var(--radius-lg);padding:14px;margin-bottom:16px;
+}
+.specials-title{
+  font-family:'Barlow Condensed',sans-serif;font-weight:900;
+  font-size:1rem;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--accent);margin-bottom:10px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.specials-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:6px;
+}
+.special-item{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 8px;background:var(--surface2);border-radius:5px;
+  cursor:pointer;transition:background .1s;
+}
+.special-item:hover{background:var(--surface3);}
+.special-item.is-owned{background:var(--green-dim);}
+.special-item .s-checkbox{cursor:pointer;}
+
+/* ── MISSING ── */
+.missing-actions{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
+#missingList{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:14px;
+}
+.missing-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));
+  gap:4px;
+}
+.missing-chip{
+  padding:4px 8px;background:var(--surface2);border-radius:4px;
+  font-family:'Barlow Condensed',sans-serif;font-weight:600;
+  font-size:.78rem;color:var(--red);text-align:center;
+}
+
+/* ── DUPLICATES ── */
+.dup-controls{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
+#dupList{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:14px;
+}
+.dup-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 10px;border-radius:5px;margin-bottom:4px;
+  background:var(--surface2);
+}
+.dup-item-code{
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:.88rem;color:var(--accent);
+}
+.dup-item-info{font-size:.78rem;color:var(--text2);}
+.dup-item-count{
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:.88rem;color:var(--red);
+}
+
+/* ── MODAL ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);
+  z-index:500;display:none;align-items:center;justify-content:center;padding:16px;
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);max-width:600px;width:100%;
+  max-height:80vh;display:flex;flex-direction:column;
+}
+.modal-header{
+  padding:14px 16px;border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.modal-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;text-transform:uppercase;letter-spacing:.05em;}
+.modal-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:1.2rem;padding:4px;}
+.modal-body{padding:16px;overflow-y:auto;flex:1;}
+.modal-footer{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+textarea.modal-text{
+  width:100%;height:260px;background:var(--surface2);border:1px solid var(--border);
+  color:var(--text);padding:10px;border-radius:var(--radius);
+  font-family:'Barlow Condensed',sans-serif;font-size:.82rem;resize:vertical;outline:none;
+}
+
+/* search highlight */
+.sticker-row.search-hit{background:var(--accent-dim)!important;}
+.sticker-row.search-hidden{display:none;}
+
+/* print */
+@media print{
+  #header,.tabs,#tab-collection,#tab-missing,#tab-duplicates,#tab-import,.header-actions{display:none!important;}
+  #tab-print{display:block!important;}
+  body{background:#fff;color:#000;}
+}
+@media(max-width:600px){
+  .dash-grid{grid-template-columns:repeat(2,1fr);}
+  .stickers-grid{grid-template-columns:1fr 1fr;}
+  #searchInput{width:120px;}
+  .header-inner{height:auto;padding:8px 0;gap:6px;}
+}
+</style>
+</head>
+<body data-theme="dark">
+
+<div id="header">
+  <div class="header-inner">
+    <div class="logo">⚽ Panini <span>WM 2026</span></div>
+    <input type="text" id="searchInput" placeholder="🔍 Code suchen..." oninput="handleSearch(this.value)">
+    <div class="header-actions">
+      <button class="btn btn-ghost" onclick="openImportDialog()">📥 Import</button>
+      <button class="btn btn-green" onclick="exportJSON()">📤 Export</button>
+      <button id="themeToggle" onclick="toggleTheme()" title="Hell/Dunkel">🌙</button>
+    </div>
+  </div>
+</div>
+
+<div class="tabs" id="tabBar">
+  <button class="tab active" data-tab="dashboard" onclick="switchTab('dashboard')">Dashboard</button>
+  <button class="tab" data-tab="collection" onclick="switchTab('collection')">Sammlung</button>
+  <button class="tab" data-tab="missing" onclick="switchTab('missing')">Fehlend</button>
+  <button class="tab" data-tab="duplicates" onclick="switchTab('duplicates')">Doppelte</button>
+</div>
+
+<div id="main">
+
+  <!-- DASHBOARD -->
+  <div id="tab-dashboard" class="tab-panel active">
+    <div class="dash-grid" id="dashStats"></div>
+    <div class="global-progress">
+      <div class="prog-header">
+        <span class="prog-title">⚽ Gesamtfortschritt</span>
+        <span class="prog-pct" id="globalPct">0%</span>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" id="globalFill" style="width:0%"></div></div>
+    </div>
+    <div class="top-teams">
+      <div class="section-title">🏆 Top-Teams nach Fortschritt</div>
+      <div class="top-team-list" id="topTeams"></div>
+    </div>
+  </div>
+
+  <!-- COLLECTION -->
+  <div id="tab-collection" class="tab-panel">
+    <div id="collectionView"></div>
+  </div>
+
+  <!-- MISSING -->
+  <div id="tab-missing" class="tab-panel">
+    <div class="missing-actions">
+      <span id="missingCount" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;color:var(--text2);"></span>
+      <button class="btn btn-ghost" onclick="copyMissing()">📋 Liste kopieren</button>
+      <button class="btn btn-ghost" onclick="downloadMissingCSV()">⬇ CSV</button>
+    </div>
+    <div id="missingList"><div class="missing-grid" id="missingGrid"></div></div>
+  </div>
+
+  <!-- DUPLICATES -->
+  <div id="tab-duplicates" class="tab-panel">
+    <div class="dup-controls">
+      <span id="dupCount" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;color:var(--text2);"></span>
+      <button class="btn btn-ghost" onclick="sortDup('code')">↕ Nach Code</button>
+      <button class="btn btn-ghost" onclick="sortDup('count')">↕ Nach Anzahl</button>
+      <button class="btn btn-accent" onclick="showTradeModal()">📋 Tauschliste</button>
+      <button class="btn btn-ghost" onclick="downloadDupCSV()">⬇ CSV</button>
+    </div>
+    <div id="dupList"></div>
+  </div>
+
+</div>
+
+<!-- IMPORT MODAL -->
+<div class="modal-overlay" id="importModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">📥 Sammlung importieren</span>
+      <button class="modal-close" onclick="closeModal('importModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.82rem;color:var(--text2);margin-bottom:10px;">JSON einfügen oder Datei wählen:</p>
+      <textarea class="modal-text" id="importText" placeholder='{"CAN1":1,"CAN2":3,...}'></textarea>
+      <div style="margin-top:10px;">
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="loadImportFile(event)">
+        <button class="btn btn-ghost" onclick="document.getElementById('importFile').click()">📂 Datei öffnen</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('importModal')">Abbrechen</button>
+      <button class="btn btn-accent" onclick="doImport()">Importieren</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRADE MODAL -->
+<div class="modal-overlay" id="tradeModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">📋 Tauschliste</span>
+      <button class="modal-close" onclick="closeModal('tradeModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <textarea class="modal-text" id="tradeText" readonly></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="copyTrade()">📋 Kopieren</button>
+      <button class="btn btn-ghost" onclick="printTrade()">🖨 Drucken</button>
+      <button class="btn btn-ghost" onclick="closeModal('tradeModal')">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════
+
+const GROUPS = {
+  "A": ["MEX","RSA","KOR","CZE"],
+  "B": ["CAN","BIH","QAT","SUI"],
+  "C": ["BRA","MAR","HAI","SCO"],
+  "D": ["USA","PAR","AUS","TUR"],
+  "E": ["GER","CUW","CIV","ECU"],
+  "F": ["NED","JPN","SWE","TUN"],
+  "G": ["BEL","EGY","IRN","NZL"],
+  "H": ["ESP","CPV","KSA","URU"],
+  "I": ["FRA","SEN","IRQ","NOR"],
+  "J": ["ARG","ALG","AUT","JOR"],
+  "K": ["POR","COD","UZB","COL"],
+  "L": ["ENG","CRO","GHA","PAN"]
+};
+
+const TEAM_NAMES = {
+  MEX:"Mexiko",RSA:"Südafrika",KOR:"Südkorea",CZE:"Tschechien",
+  CAN:"Kanada",BIH:"Bosnien-Herz.",QAT:"Katar",SUI:"Schweiz",
+  BRA:"Brasilien",MAR:"Marokko",HAI:"Haiti",SCO:"Schottland",
+  USA:"USA",PAR:"Paraguay",AUS:"Australien",TUR:"Türkei",
+  GER:"Deutschland",CUW:"Curaçao",CIV:"Elfenbeinküste",ECU:"Ecuador",
+  NED:"Niederlande",JPN:"Japan",SWE:"Schweden",TUN:"Tunesien",
+  BEL:"Belgien",EGY:"Ägypten",IRN:"Iran",NZL:"Neuseeland",
+  ESP:"Spanien",CPV:"Kap Verde",KSA:"Saudi-Arabien",URU:"Uruguay",
+  FRA:"Frankreich",SEN:"Senegal",IRQ:"Irak",NOR:"Norwegen",
+  ARG:"Argentinien",ALG:"Algerien",AUT:"Österreich",JOR:"Jordanien",
+  POR:"Portugal",COD:"DR Kongo",UZB:"Usbekistan",COL:"Kolumbien",
+  ENG:"England",CRO:"Kroatien",GHA:"Ghana",PAN:"Panama"
+};
+
+const TEAM_FLAGS = {
+  MEX:"🇲🇽",RSA:"🇿🇦",KOR:"🇰🇷",CZE:"🇨🇿",
+  CAN:"🇨🇦",BIH:"🇧🇦",QAT:"🇶🇦",SUI:"🇨🇭",
+  BRA:"🇧🇷",MAR:"🇲🇦",HAI:"🇭🇹",SCO:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+  USA:"🇺🇸",PAR:"🇵🇾",AUS:"🇦🇺",TUR:"🇹🇷",
+  GER:"🇩🇪",CUW:"🇨🇼",CIV:"🇨🇮",ECU:"🇪🇨",
+  NED:"🇳🇱",JPN:"🇯🇵",SWE:"🇸🇪",TUN:"🇹🇳",
+  BEL:"🇧🇪",EGY:"🇪🇬",IRN:"🇮🇷",NZL:"🇳🇿",
+  ESP:"🇪🇸",CPV:"🇨🇻",KSA:"🇸🇦",URU:"🇺🇾",
+  FRA:"🇫🇷",SEN:"🇸🇳",IRQ:"🇮🇶",NOR:"🇳🇴",
+  ARG:"🇦🇷",ALG:"🇩🇿",AUT:"🇦🇹",JOR:"🇯🇴",
+  POR:"🇵🇹",COD:"🇨🇩",UZB:"🇺🇿",COL:"🇨🇴",
+  ENG:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",CRO:"🇭🇷",GHA:"🇬🇭",PAN:"🇵🇦"
+};
+
+const SPECIALS = ["PANINI00"];
+for(let i=1;i<=19;i++) SPECIALS.push("FWC"+i);
+
+// Build team stickers
+const TEAM_STICKERS = {};
+const ALL_TEAMS = Object.values(GROUPS).flat();
+ALL_TEAMS.forEach(code => {
+  TEAM_STICKERS[code] = Array.from({length:20},(_,i)=>code+(i+1));
+});
+
+// All sticker codes
+const ALL_CODES = [...SPECIALS];
+ALL_TEAMS.forEach(c => ALL_CODES.push(...TEAM_STICKERS[c]));
+// Total should be 20 + 48*20 = 20 + 960 = 980
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let owned = {}; // code -> count (0 or more)
+
+function loadState(){
+  try{
+    const s = localStorage.getItem('panini_wm2026_v3');
+    if(s){ owned = JSON.parse(s); }
+  }catch(e){}
+}
+function saveState(){
+  localStorage.setItem('panini_wm2026_v3', JSON.stringify(owned));
+}
+function getCount(code){ return owned[code]||0; }
+function isOwned(code){ return getCount(code)>=1; }
+function setCount(code, n){
+  n = Math.max(0,n);
+  if(n===0) delete owned[code];
+  else owned[code]=n;
+  saveState();
+}
+
+// ═══════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════
+function calcStats(){
+  let total=ALL_CODES.length, collected=0, totalQty=0, totalDup=0;
+  let doneTeams=0;
+  ALL_CODES.forEach(c=>{
+    const q=getCount(c);
+    if(q>=1){ collected++; totalQty+=q; totalDup+=(q-1); }
+  });
+  ALL_TEAMS.forEach(code=>{
+    const done = TEAM_STICKERS[code].every(s=>isOwned(s));
+    if(done) doneTeams++;
+  });
+  return {total, collected, missing:total-collected, totalQty, totalDup, doneTeams,
+    pct: total>0?Math.round(collected/total*100):0};
+}
+
+// ═══════════════════════════════════════════
+// RENDER DASHBOARD
+// ═══════════════════════════════════════════
+function renderDashboard(){
+  const s=calcStats();
+  document.getElementById('globalPct').textContent=s.pct+'%';
+  document.getElementById('globalFill').style.width=s.pct+'%';
+
+  document.getElementById('dashStats').innerHTML=`
+    <div class="stat-card"><div class="stat-val">${s.total}</div><div class="stat-label">Sticker gesamt</div></div>
+    <div class="stat-card"><div class="stat-val green">${s.collected}</div><div class="stat-label">Gesammelt</div></div>
+    <div class="stat-card"><div class="stat-val red">${s.missing}</div><div class="stat-label">Fehlend</div></div>
+    <div class="stat-card"><div class="stat-val blue">${s.pct}%</div><div class="stat-label">Sammelquote</div></div>
+    <div class="stat-card"><div class="stat-val">${s.totalQty}</div><div class="stat-label">Sticker insgesamt</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--accent)">${s.totalDup}</div><div class="stat-label">Doppelte</div></div>
+    <div class="stat-card"><div class="stat-val green">${s.doneTeams}</div><div class="stat-label">Teams komplett</div></div>
+    <div class="stat-card"><div class="stat-val">${s.total-s.collected}</div><div class="stat-label">Noch fehlend</div></div>
+  `;
+
+  // Top teams
+  const teamPcts = ALL_TEAMS.map(code=>{
+    const stickers=TEAM_STICKERS[code];
+    const cnt=stickers.filter(s=>isOwned(s)).length;
+    return {code, cnt, pct:Math.round(cnt/stickers.length*100)};
+  }).sort((a,b)=>b.pct-a.pct).slice(0,8);
+
+  document.getElementById('topTeams').innerHTML=teamPcts.map(t=>`
+    <div class="top-team-row">
+      <span class="top-team-code">${TEAM_FLAGS[t.code]||''} ${t.code}</span>
+      <div class="top-team-bar"><div class="top-team-fill" style="width:${t.pct}%"></div></div>
+      <span class="top-team-pct">${t.pct}%</span>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════
+// RENDER COLLECTION
+// ═══════════════════════════════════════════
+function buildStickerRow(code){
+  const q=getCount(code);
+  const owned=q>=1;
+  const isDup=q>1;
+  let extra='';
+  const n=parseInt(code.replace(/[A-Z_]+/g,''));
+  const isWappen=(n===1||n===2)&&!SPECIALS.includes(code);
+  const isFoto=(n===13)&&!SPECIALS.includes(code);
+  let classes='sticker-row';
+  if(owned) classes+=' is-owned';
+  if(isWappen) classes+=' is-wappen';
+  if(isFoto) classes+=' is-foto';
+  if(isDup) extra=`<span class="dup-badge">+${q-1}</span>`;
+  return `<div class="${classes}" data-code="${code}">
+    <div class="s-checkbox" onclick="toggleCode('${code}')">${owned?'✓':''}</div>
+    <span class="s-code">${code}</span>
+    ${extra}
+    <div class="qty-wrap">
+      <button class="qty-btn" onclick="changeQty('${code}',-1)">−</button>
+      <span class="qty-num${isDup?' dup':''}">${q}</span>
+      <button class="qty-btn" onclick="changeQty('${code}',1)">+</button>
+    </div>
+  </div>`;
+}
+
+function buildTeamBlock(code){
+  const stickers=TEAM_STICKERS[code];
+  const cnt=stickers.filter(s=>isOwned(s)).length;
+  const pct=Math.round(cnt/stickers.length*100);
+  const done=cnt===stickers.length;
+  return `<div class="team-block collapsed" id="team-${code}">
+    <div class="team-header" onclick="toggleTeam('${code}')">
+      <span class="team-flag">${TEAM_FLAGS[code]||'🏳'}</span>
+      <span class="team-code">${code}</span>
+      <span class="team-name-label">${TEAM_NAMES[code]||''}</span>
+      <div class="team-prog-wrap">
+        <div class="team-prog-bar"><div class="team-prog-fill" id="tf-${code}" style="width:${pct}%"></div></div>
+        <span class="team-prog-txt" id="tt-${code}">${cnt}/20 · ${pct}%</span>
+        ${done?'<span class="team-done-badge">✓</span>':''}
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="stickers-grid" id="sg-${code}">
+      ${stickers.map(s=>buildStickerRow(s)).join('')}
+    </div>
+  </div>`;
+}
+
+function renderCollection(){
+  const container=document.getElementById('collectionView');
+  let html='';
+
+  // Specials
+  const sOwnedCnt=SPECIALS.filter(s=>isOwned(s)).length;
+  html+=`<div class="specials-block">
+    <div class="specials-title">
+      ✨ Sondersticker <span style="font-size:.8rem;color:var(--text2)">${sOwnedCnt}/${SPECIALS.length}</span>
+    </div>
+    <div class="specials-grid">
+      ${SPECIALS.map(s=>{
+        const q=getCount(s); const ow=q>=1;
+        return `<div class="special-item${ow?' is-owned':''}" data-code="${s}">
+          <div class="s-checkbox" onclick="toggleCode('${s}')">${ow?'✓':''}</div>
+          <span class="s-code" style="color:var(--accent)">${s}</span>
+          <div class="qty-wrap">
+            <button class="qty-btn" onclick="changeQty('${s}',-1)">−</button>
+            <span class="qty-num">${q}</span>
+            <button class="qty-btn" onclick="changeQty('${s}',1)">+</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+
+  // Groups
+  Object.entries(GROUPS).forEach(([grp,teams])=>{
+    html+=`<div class="group-block">
+      <div class="group-header"><span class="group-name">GRUPPE ${grp}</span></div>
+      ${teams.map(c=>buildTeamBlock(c)).join('')}
+    </div>`;
+  });
+
+  container.innerHTML=html;
+}
+
+// ═══════════════════════════════════════════
+// TOGGLE / QTY
+// ═══════════════════════════════════════════
+function toggleCode(code){
+  const cur=getCount(code);
+  setCount(code, cur>=1?0:1);
+  updateStickerRow(code);
+  updateTeamProgress(getTeamOfCode(code));
+  renderDashboard();
+  if(currentTab==='missing') renderMissing();
+  if(currentTab==='duplicates') renderDuplicates();
+}
+
+function changeQty(code,delta){
+  const cur=getCount(code);
+  setCount(code,cur+delta);
+  updateStickerRow(code);
+  updateTeamProgress(getTeamOfCode(code));
+  renderDashboard();
+  if(currentTab==='missing') renderMissing();
+  if(currentTab==='duplicates') renderDuplicates();
+}
+
+function getTeamOfCode(code){
+  for(const t of ALL_TEAMS){
+    if(code.startsWith(t)) return t;
+  }
+  return null;
+}
+
+function updateStickerRow(code){
+  const rows=document.querySelectorAll(`[data-code="${code}"]`);
+  rows.forEach(row=>{
+    const q=getCount(code);
+    const ow=q>=1;
+    const isDup=q>1;
+    const n=parseInt(code.replace(/[A-Z_]+/g,''));
+    const isWappen=(n===1||n===2)&&!SPECIALS.includes(code);
+    const isFoto=(n===13)&&!SPECIALS.includes(code);
+    row.className=(row.classList.contains('sticker-row')?'sticker-row':'special-item')
+      +(ow?' is-owned':'')
+      +(isWappen?' is-wappen':'')
+      +(isFoto?' is-foto':'');
+    const cb=row.querySelector('.s-checkbox');
+    if(cb) cb.textContent=ow?'✓':'';
+    const qn=row.querySelector('.qty-num');
+    if(qn){ qn.textContent=q; qn.className='qty-num'+(isDup?' dup':''); }
+    const db=row.querySelector('.dup-badge');
+    if(isDup){
+      if(db) db.textContent=`+${q-1}`;
+      else {
+        const sc=row.querySelector('.s-code');
+        if(sc){ const sp=document.createElement('span'); sp.className='dup-badge'; sp.textContent=`+${q-1}`; sc.after(sp); }
+      }
+    } else {
+      if(db) db.remove();
+    }
+  });
+}
+
+function updateTeamProgress(teamCode){
+  if(!teamCode) return;
+  const stickers=TEAM_STICKERS[teamCode];
+  if(!stickers) return;
+  const cnt=stickers.filter(s=>isOwned(s)).length;
+  const pct=Math.round(cnt/20*100);
+  const fill=document.getElementById('tf-'+teamCode);
+  const txt=document.getElementById('tt-'+teamCode);
+  if(fill) fill.style.width=pct+'%';
+  if(txt) txt.textContent=`${cnt}/20 · ${pct}%`;
+}
+
+function toggleTeam(code){
+  const block=document.getElementById('team-'+code);
+  if(block) block.classList.toggle('collapsed');
+}
+
+// ═══════════════════════════════════════════
+// MISSING
+// ═══════════════════════════════════════════
+function renderMissing(){
+  const missing=ALL_CODES.filter(c=>!isOwned(c));
+  document.getElementById('missingCount').textContent=`${missing.length} fehlende Sticker`;
+  document.getElementById('missingGrid').innerHTML=missing.map(c=>
+    `<div class="missing-chip">${c}</div>`).join('');
+}
+function copyMissing(){
+  const missing=ALL_CODES.filter(c=>!isOwned(c));
+  navigator.clipboard.writeText(missing.join('\n')).then(()=>alert('Kopiert!'));
+}
+function downloadMissingCSV(){
+  const missing=ALL_CODES.filter(c=>!isOwned(c));
+  const blob=new Blob(['Code\n'+missing.join('\n')],{type:'text/csv'});
+  dlBlob(blob,'fehlende_sticker.csv');
+}
+
+// ═══════════════════════════════════════════
+// DUPLICATES
+// ═══════════════════════════════════════════
+let dupSort='code';
+function renderDuplicates(){
+  const dups=ALL_CODES.filter(c=>getCount(c)>1)
+    .map(c=>({code:c,count:getCount(c),dup:getCount(c)-1}));
+  if(dupSort==='count') dups.sort((a,b)=>b.dup-a.dup);
+  else dups.sort((a,b)=>a.code.localeCompare(b.code));
+
+  const total=dups.reduce((s,d)=>s+d.dup,0);
+  document.getElementById('dupCount').textContent=`${dups.length} Sticker mit Duplikaten · ${total} doppelte gesamt`;
+  document.getElementById('dupList').innerHTML=dups.length===0
+    ?'<p style="color:var(--text2);font-size:.85rem;padding:12px">Keine doppelten Sticker vorhanden.</p>'
+    :dups.map(d=>`<div class="dup-item">
+        <div>
+          <span class="dup-item-code">${d.code}</span>
+          <span class="dup-item-info"> · ${d.count}× vorhanden</span>
+        </div>
+        <span class="dup-item-count">+${d.dup} 🔁</span>
+      </div>`).join('');
+}
+function sortDup(by){ dupSort=by; renderDuplicates(); }
+
+function showTradeModal(){
+  const dups=ALL_CODES.filter(c=>getCount(c)>1)
+    .map(c=>({code:c,dup:getCount(c)-1}))
+    .sort((a,b)=>a.code.localeCompare(b.code));
+  const text=dups.length===0?'Keine doppelten Sticker.'
+    :'=== Tauschliste WM 2026 ===\n\n'+dups.map(d=>`${d.code} (${d.dup}× doppelt)`).join('\n');
+  document.getElementById('tradeText').value=text;
+  openModal('tradeModal');
+}
+function copyTrade(){
+  navigator.clipboard.writeText(document.getElementById('tradeText').value).then(()=>alert('Kopiert!'));
+}
+function printTrade(){
+  const w=window.open('','_blank');
+  w.document.write('<pre style="font-family:monospace;font-size:13px">'+document.getElementById('tradeText').value+'</pre>');
+  w.print();
+}
+function downloadDupCSV(){
+  const dups=ALL_CODES.filter(c=>getCount(c)>1);
+  const rows=['Code,Vorhanden,Doppelte',...dups.map(c=>`${c},${getCount(c)},${getCount(c)-1}`)];
+  dlBlob(new Blob([rows.join('\n')],{type:'text/csv'}),'tauschliste.csv');
+}
+
+// ═══════════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════════
+function handleSearch(val){
+  val=val.trim().toUpperCase();
+  document.querySelectorAll('.sticker-row,.special-item').forEach(row=>{
+    const code=row.dataset.code||'';
+    if(!val){ row.classList.remove('search-hidden','search-hit'); return; }
+    if(code.includes(val)){
+      row.classList.remove('search-hidden');
+      row.classList.add('search-hit');
+      // open parent team
+      const block=row.closest('.team-block');
+      if(block) block.classList.remove('collapsed');
+    } else {
+      row.classList.add('search-hidden');
+      row.classList.remove('search-hit');
+    }
+  });
+}
+
+// ═══════════════════════════════════════════
+// IMPORT / EXPORT
+// ═══════════════════════════════════════════
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(owned,null,2)],{type:'application/json'});
+  dlBlob(blob,'panini_wm2026_sammlung.json');
+}
+function openImportDialog(){ openModal('importModal'); }
+function loadImportFile(e){
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=ev=>{ document.getElementById('importText').value=ev.target.result; };
+  r.readAsText(f);
+}
+function doImport(){
+  try{
+    const data=JSON.parse(document.getElementById('importText').value);
+    owned={};
+    Object.entries(data).forEach(([k,v])=>{ if(ALL_CODES.includes(k)) owned[k]=Math.max(0,parseInt(v)||0); });
+    saveState();
+    closeModal('importModal');
+    fullRender();
+  }catch(e){ alert('Ungültiges JSON: '+e.message); }
+}
+
+// ═══════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════
+let currentTab='dashboard';
+function switchTab(name){
+  currentTab=name;
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.querySelector(`[data-tab="${name}"]`).classList.add('active');
+  if(name==='missing') renderMissing();
+  if(name==='duplicates') renderDuplicates();
+  if(name==='dashboard') renderDashboard();
+}
+
+// ═══════════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════════
+function toggleTheme(){
+  const t=document.body.getAttribute('data-theme');
+  const next=t==='dark'?'light':'dark';
+  document.body.setAttribute('data-theme',next);
+  document.getElementById('themeToggle').textContent=next==='dark'?'🌙':'☀️';
+  localStorage.setItem('panini_theme',next);
+}
+
+// ═══════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+// ═══════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════
+function dlBlob(blob,name){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=name; a.click();
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+function fullRender(){
+  renderCollection();
+  renderDashboard();
+}
+
+loadState();
+// restore theme
+const savedTheme=localStorage.getItem('panini_theme')||'dark';
+document.body.setAttribute('data-theme',savedTheme);
+document.getElementById('themeToggle').textContent=savedTheme==='dark'?'🌙':'☀️';
+fullRender();
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(o=>{
+  o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); });
+});
+</script>
+</body>
+</html>
